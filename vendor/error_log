@@ -1,0 +1,44 @@
+[04-Nov-2019 18:18:54 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function mysqli_connect() in /home/vesencom/public_html/kisoko/controller/config.php:8
+Stack trace:
+#0 /home/vesencom/public_html/kisoko/vendor/new.php(12): require()
+#1 {main}
+  thrown in /home/vesencom/public_html/kisoko/controller/config.php on line 8
+[04-Nov-2019 18:22:41 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function mysqli_connect() in /home/vesencom/public_html/kisoko/controller/config.php:8
+Stack trace:
+#0 /home/vesencom/public_html/kisoko/vendor/new.php(12): require()
+#1 {main}
+  thrown in /home/vesencom/public_html/kisoko/controller/config.php on line 8
+[04-Nov-2019 18:27:11 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function mysqli_connect() in /home/vesencom/public_html/kisoko/controller/config.php:8
+Stack trace:
+#0 /home/vesencom/public_html/kisoko/vendor/new.php(12): require()
+#1 {main}
+  thrown in /home/vesencom/public_html/kisoko/controller/config.php on line 8
+[04-Nov-2019 18:27:13 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function mysqli_connect() in /home/vesencom/public_html/kisoko/controller/config.php:8
+Stack trace:
+#0 /home/vesencom/public_html/kisoko/vendor/new.php(12): require()
+#1 {main}
+  thrown in /home/vesencom/public_html/kisoko/controller/config.php on line 8
+[04-Nov-2019 18:27:37 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function mysqli_connect() in /home/vesencom/public_html/kisoko/controller/config.php:8
+Stack trace:
+#0 /home/vesencom/public_html/kisoko/vendor/new.php(12): require()
+#1 {main}
+  thrown in /home/vesencom/public_html/kisoko/controller/config.php on line 8
+[04-Nov-2019 18:32:07 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function mysqli_connect() in /home/vesencom/public_html/kisoko/controller/config.php:8
+Stack trace:
+#0 /home/vesencom/public_html/kisoko/vendor/new.php(12): require()
+#1 {main}
+  thrown in /home/vesencom/public_html/kisoko/controller/config.php on line 8
+[04-Nov-2019 18:32:56 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function mysqli_connect() in /home/vesencom/public_html/kisoko/controller/config.php:8
+Stack trace:
+#0 /home/vesencom/public_html/kisoko/vendor/new.php(12): require()
+#1 {main}
+  thrown in /home/vesencom/public_html/kisoko/controller/config.php on line 8
+[04-Nov-2019 18:32:59 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function mysqli_connect() in /home/vesencom/public_html/kisoko/controller/config.php:8
+Stack trace:
+#0 /home/vesencom/public_html/kisoko/vendor/new.php(12): require()
+#1 {main}
+  thrown in /home/vesencom/public_html/kisoko/controller/config.php on line 8
+[04-Nov-2019 18:46:39 Africa/Nairobi] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/vesencom/public_html/kisoko/vendor/phpmailer/phpmailer/src/SMTP.php:267) in /home/vesencom/public_html/kisoko/vendor/new.php on line 89
+[04-Nov-2019 18:47:26 Africa/Nairobi] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/vesencom/public_html/kisoko/vendor/phpmailer/phpmailer/src/SMTP.php:267) in /home/vesencom/public_html/kisoko/vendor/new.php on line 89
+[04-Nov-2019 18:52:44 Africa/Nairobi] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/vesencom/public_html/kisoko/vendor/phpmailer/phpmailer/src/SMTP.php:267) in /home/vesencom/public_html/kisoko/vendor/new.php on line 89
+[04-Nov-2019 18:52:50 Africa/Nairobi] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/vesencom/public_html/kisoko/vendor/phpmailer/phpmailer/src/SMTP.php:267) in /home/vesencom/public_html/kisoko/vendor/new.php on line 89
