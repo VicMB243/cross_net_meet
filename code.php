@@ -135,90 +135,12 @@ if (isset($_POST['registerbtn2'])) {
     }
 
 
-
-
-
-
-
-     
     
 }
 
-if (isset($_POST['registerbtn2'])) {
 
 
 
-
-    if(isset ($_SESSION['uid']))
-    {
-        
-        
-        $uid =  $_SESSION['uid'];
-
-
-
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
-        {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
-            
-            if (strpos($row['roles'], 'ADD ORGANISATION') !== false) 
-            {
-
-                
-                
-
-                $name = mysqli_real_escape_string($conn,$_POST['name']);
-                $email = mysqli_real_escape_string($conn,$_POST['email']);
-               $password = md5(mysqli_real_escape_string($conn,$_POST['password']));
-           
-               $email_query = "SELECT * FROM organisation WHERE email = '$email'";
-               $email_query_run = mysqli_query($conn, $email_query);
-           
-               if (mysqli_num_rows($email_query_run) > 0)
-               {
-                $_SESSION['status'] = "Email Already Taken";
-                    $_SESSION['status_code'] = "error";
-                header ('Location:add.php');
-                
-                    }
-                    else {
-                    
-                    $sql = "INSERT INTO `organisation`(`name`, `email`, `status`, `password`) VALUES ('$name','$email', 'active','$password' )";
-                }
-            if (mysqli_query($conn,$sql)) {
-                   $sql2 = "select * from organisation order by id desc";
-                   $res2 = mysqli_query($conn,$sql2)->fetch_assoc();
-                   $_SESSION['status'] = "Added";
-                $_SESSION['status_code'] = "Success";
-                   header("location:add.php");
-               }
-                                    
-            }else{
-                header("location: not_allowed_dialog.php");
-                exit;
-            }
-        
-        }
-
-    }
-
-
-
-
-
-
-
-
-
-
-    
-}
 
 if (isset($_POST['register_btn2'])) {
 
@@ -254,6 +176,173 @@ header ('Location:users2.php');
 
     
 }
+
+
+if (isset($_POST['registerbtn3'])) {
+
+
+
+
+    if(isset ($_SESSION['uid']) && isset ($_SESSION['brands']))
+    {
+        
+        
+        $uid =  $_SESSION['uid'];
+        $brand_id = $_SESSION['brands'];
+
+
+
+        $sql = "SELECT roles FROM brand_admins WHERE id='$uid'";
+        $result = mysqli_query($conn,$sql);
+
+        if (mysqli_num_rows($result)==0)
+        {
+            header("location: not_allowed_dialog.php");
+            exit;
+        }
+        while($row = mysqli_fetch_array($result)){
+            
+            if (strpos($row['roles'], 'ADD BRAND ADMIN') !== false) 
+            {
+
+                
+                
+
+                $name = mysqli_real_escape_string($conn,$_POST['username']);
+                $email = mysqli_real_escape_string($conn,$_POST['email']);
+               $password = md5(mysqli_real_escape_string($conn,$_POST['password']));
+               $datecreated = date("Y-m-d H:i:s");
+               $roles = 'add';
+           
+               $email_query = "SELECT * FROM brand_admins WHERE email = '$email'";
+               $email_query_run = mysqli_query($conn, $email_query);
+           
+               if (mysqli_num_rows($email_query_run) > 0)
+               {
+                $_SESSION['status'] = "Email Already Taken";
+                    $_SESSION['status_code'] = "error";
+                header ('Location:employee.php');
+                
+                    }
+                    else {
+                    
+                    $sql = "INSERT INTO `brand_admins` (`brand_id`,`username`, `email`, `password`,`status`, `datecreated`, `roles`)
+                     VALUES ('$brand_id','$name','$email', '$password', 'active', '$datecreated', '$roles' )";
+                }
+            if (mysqli_query($conn,$sql)) {
+                   $sql2 = "select * from brand_admins order by id desc";
+                   $res2 = mysqli_query($conn,$sql2)->fetch_assoc();
+                   $_SESSION['status'] = "Added";
+                $_SESSION['status_code'] = "Success";
+                   header("location: employee.php");
+               }                   
+            }else{
+                header("location: not_allowed_dialog.php");
+                exit;
+            }
+        
+        }
+
+    }
+
+
+}
+
+
+
+
+if (isset($_POST['registerbtn4'])) {
+
+
+    if(isset ($_SESSION['brands']) && isset ($_SESSION['email']))
+    {
+        
+        
+        $uEmail =  $_SESSION['email'];
+        $brand_id = $_SESSION['brands'];
+
+
+        
+
+        $sql = "SELECT roles FROM brand_admins WHERE email='$uEmail'";
+        $result = mysqli_query($conn,$sql);
+
+        if (mysqli_num_rows($result)==0)
+        {
+            
+             header("location: not_allowed_dialog.php");
+            exit;
+        }
+        while($row = mysqli_fetch_array($result)){
+            
+            if (strpos($row['roles'], 'ADD EMPLOYEE') !== false || strpos($row['roles'], 'ADD REGISTER') !== false) 
+            {
+
+               
+                
+               
+                $empname = mysqli_real_escape_string($conn,$_POST['empname']);
+                $email = mysqli_real_escape_string($conn,$_POST['email']);
+                $organization = mysqli_real_escape_string($conn,$_POST['organization']);
+                $department = mysqli_real_escape_string($conn,$_POST['department']);
+                $password = md5(mysqli_real_escape_string($conn,$_POST['password']));
+                
+                $val = "1";
+                $active = settype($val, "integer");;
+                $date = date("Y-m-d");
+                $time = date("h:i:sa");
+
+
+           
+               $email_query = "SELECT * FROM register WHERE email = '$email'";
+               $email_query_run = mysqli_query($conn, $email_query);
+           
+               if (mysqli_num_rows($email_query_run) > 0)
+               {
+                $_SESSION['status'] = "Email Already Taken";
+                    $_SESSION['status_code'] = "error";
+                header ('Location:employee.php');
+                
+                    }
+                    else {
+
+
+                       // $sql = "INSERT INTO `employee` (`username`,`email`, `active`,`password`) VALUES ('$empname', '$email', '1', '$password')";
+  
+                    
+                    $sqlinsert = "INSERT INTO `register` ( `username`, `email`,`organization`, `department`, `password`,`ddd69075bc4`,`active`,`date`,`time`) 
+                    VALUES ('$empname','$email','$organization', '$department','$password','$ddd69075bc4','$active','$date','$time' )";
+                    
+                }
+
+               
+                
+                    if (mysqli_query($conn,$sqlinsert)) {
+                        $sql2 = "select * from register order by id desc";
+                        $res2 = mysqli_query($conn,$sql2)->fetch_assoc();
+                        $_SESSION['username'] = $res2['id'];
+                        $_SESSION['status'] = "Added";
+                        $_SESSION['status_code'] = "Success";
+                        header("location: employee.php");
+                    }
+                    
+                
+                                    
+            }else{
+                
+                header("location: not_allowed_dialog.php");
+                exit;
+            }
+        
+        }
+
+    }
+
+
+    
+}
+
+
 
 
 

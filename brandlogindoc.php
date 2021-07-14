@@ -15,6 +15,8 @@ if(isset($_POST["login_btn"])){
 
 if($email==$emaill && $password==$passwordd){
       $_SESSION['brands'] = $row['id'];
+      $_SESSION['email'] = $row['email'];
+      
       $_SESSION['status'] = "Welcome to your Dashboard";
      $_SESSION['status_code'] = "Success";
   header("location:index2.php");

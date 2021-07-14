@@ -38,6 +38,14 @@ include 'controller/config.php';
         
         </a>
       </li>
+      <li class="nav-item">
+       <a class="nav-link" data-toggle="modal" data-target="#addadminprofile" href="">
+
+           <i class="fas fa-user-circle"></i>
+          <span>Add Brand Admin</span>
+        </a>
+        
+      </li>
 
     
       <li class="nav-item">
@@ -59,6 +67,17 @@ include 'controller/config.php';
         </a>
         
       </li>
+
+      <li class="nav-item">
+       <a class="nav-link" data-toggle="modal" data-target="#addemployeeprofile" href="">
+
+           <i class="fas fa-user-circle"></i>
+          <span>Add new Employee</span>
+        </a>
+        
+      </li>
+
+
       <li class="nav-item">
        <a class="nav-link" href="employee2.php">
           <i class="fas fa-user-circle"></i>
@@ -402,3 +421,117 @@ include 'controller/config.php';
       </div>
     </div>
   </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <div class="modal fade" id="addadminprofile" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Brand Admin Data</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+
+      </div>
+
+      <div class="modal-body">
+      <form action="code.php" method="POST">
+
+        
+
+            
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" class="form-control check_email" placeholder="Enter Email">
+               <small class="error_emaila" style="color: red;"></small>
+            </div>
+            <div class="form-group">
+                <label> Username </label>
+                <input type="text" name="username" class="form-control" placeholder="Enter Username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" class="form-control" placeholder="Enter Password">
+            </div>
+           
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" name="registerbtn3" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+  <div class="modal fade" id="addemployeeprofile" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Employee Data</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+
+      </div>
+
+      <div class="modal-body">
+      <form action="code.php" method="POST">
+
+        
+            <div class="form-group">
+                <label> Employee name </label>
+                <input type="text" name="empname" class="form-control" placeholder="Enter Employee name">
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" class="form-control check_email" placeholder="Enter Email">
+               <small class="error_emaila" style="color: red;"></small>
+            </div>
+            <div class="form-group">
+                <label> Organization </label>
+                <input type="text" name="organization" class="form-control" placeholder="Enter Employee organisation">
+            </div>
+            <div class="form-group">
+                <label> Department </label>
+                <input type="text" name="department" class="form-control" placeholder="Enter Department">
+            </div>
+            
+            
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" class="form-control" placeholder="Enter Password">
+            </div>
+            
+           
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" name="registerbtn4" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
