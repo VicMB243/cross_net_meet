@@ -98,6 +98,7 @@ include ('includes/navbar.php');
                       $row = mysqli_num_rows($query_run);
                       echo  '<h4> Total Organisations' .$row. '</h4>';
 
+
                       ?>
                     </div>
                     <div class="col-auto">

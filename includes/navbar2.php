@@ -446,7 +446,7 @@ include 'controller/config.php';
       </div>
 
       <div class="modal-body">
-      <form action="code.php" method="POST">
+      <form action="sub3.php" method="POST">
 
         
 
@@ -494,7 +494,7 @@ include 'controller/config.php';
       </div>
 
       <div class="modal-body">
-      <form action="code.php" method="POST">
+      <form action="sub3.php" method="POST">
 
         
             <div class="form-group">

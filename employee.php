@@ -169,7 +169,7 @@ include ('includes/footer.php');
       </div>
 
       <div class="modal-body">
-      <form action="code.php" method="POST">
+      <form action="sub3.php" method="POST">
 
         
 
@@ -214,7 +214,7 @@ include ('includes/footer.php');
       </div>
 
       <div class="modal-body">
-      <form action="code.php" method="POST">
+      <form action="sub3.php" method="POST">
 
         
 

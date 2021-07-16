@@ -1,5 +1,6 @@
 <?php
 include 'controller/config.php';
+include_once 'update_log.php';
 
 if(isset($_POST["loginbbtn"])){
  
@@ -14,11 +15,23 @@ if(isset($_POST["loginbbtn"])){
   $passwordd=$row['password'];
 
 if($email==$emaill && $password==$passwordd){
-      $_SESSION['brands2'] = $row['id'];
-      $_SESSION['uid'] = $row['id'];
-      $_SESSION['status'] = "Welcome to your Dashboard";
-     $_SESSION['status_code'] = "Success";
-header("location:index.php");
+      
+     
+      
+     if (update_log("Login as super admin",$email) ) 
+     {
+            $_SESSION['brands2'] = $row['id'];
+            $_SESSION['brands'] = $row['id'];
+            $_SESSION['uid'] = $row['id'];
+            $_SESSION['email'] = $row['email'];
+            $_SESSION['last_login_timestamp'] = time();
+            $_SESSION['status'] = "Welcome to your Dashboard";
+        $_SESSION['status_code'] = "Success";
+          header("location:index.php");
+     }
+
+
+//header("location:index.php");
     
   }
   else{

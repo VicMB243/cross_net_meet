@@ -8,7 +8,7 @@
 </button>
 </div>
 <div class="modal-body">
-<p>Your email has been sent succesfullly</p>
+<p>Your email has been sent succesfully</p>
 </div>
 <div class="modal-footer justify-content-between">
 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

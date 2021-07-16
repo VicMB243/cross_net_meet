@@ -51,11 +51,7 @@ include('../controller/config.php');
                         if(mysqli_num_rows($result) > 0){
 
 
-                            $organization_id = row['brand_id'];
-
-                            $sql = "SELECT * FROM organisation WHERE id = '$organization_id'";
-                            $query_run = mysqli_query($conn, $sql)->fetch_assoc();
-                            $organizationname = $query_run['name'];
+                           
 
 
 
@@ -73,6 +69,13 @@ include('../controller/config.php');
                                 echo "</thead>";
                                 echo "<tbody>";
                                 while($row = mysqli_fetch_array($result)){
+                                    $organization_id = $row['brand_id'];
+
+                                    $sql = "SELECT * FROM organisation WHERE id = '$organization_id'";
+                                    $query_run = mysqli_query($conn, $sql)->fetch_assoc();
+                                    $organizationname = $query_run['name'];
+
+                                    
                                     echo "<tr>";
                                         echo "<td>" . $row['id'] . "</td>";
                                         echo "<td>" . $row['email'] . "</td>";

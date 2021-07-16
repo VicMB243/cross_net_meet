@@ -239,7 +239,8 @@
 
                         header("location: brand_admins.php");
                         
-                    } else{
+                    } 
+                    else{
                         
                         echo "MySQL Error: " . mysqli_error($conn);
                     }

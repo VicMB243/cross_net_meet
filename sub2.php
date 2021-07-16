@@ -1,13 +1,8 @@
 <?php
 include('security.php');
 
-
-
-
-
-
-
-
+include ('update_log.php');
+include ('admin_roles_validation.php');
 
 
 
@@ -21,18 +16,9 @@ if (isset($_POST['package']))
 
 
 
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
-        {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
             
-            if (strpos($row['roles'], 'ADD SUBSCRIPTION') !== false) 
-            {
+        if (admin_roles_validation('ADD SUBSCRIPTION') ) 
+        {
    
                 if (isset($_POST['category'])) {
                     if ($_POST['category']== 'Monthly'){
@@ -57,20 +43,33 @@ if (isset($_POST['package']))
                     $category = mysqli_real_escape_string($conn,$_POST['category']);
                     
                     
-                    $sql = "INSERT INTO `subscription` ( `phone`, `package`, `startdate`, `enddate`,`status`,`organisationid`) VALUES ('$phone', '$category','$date','$newdate', 'pending', '$id')";
-                        if (mysqli_query($conn,$sql)) {
-                            $sql2 = "select * from subscription order by id desc";
-                            $res2 = mysqli_query($conn,$sql2)->fetch_assoc();
-                    $_SESSION['subscribe'] = $res2['id'];
-                            if($res2)
-                    {
-                    
-                       $_SESSION['pendig'] = $res2['id'];
-                    
-                       header ('Location:users2.php');
-                    
-                    }
-                    }
+                    $sql = "INSERT INTO `subscription` ( `phone`, `package`, `startdate`, `enddate`,`status`,`organisationid`)
+                     VALUES ('$phone', '$category','$date','$newdate', 'pending', '$id')";
+                        if (mysqli_query($conn,$sql))
+                         {
+
+
+
+                            if (update_log("Added subscription  in pachage category ".$category. " for organisation ID: ".$id)) 
+                            {
+
+                                $sql2 = "select * from subscription order by id desc";
+                                $res2 = mysqli_query($conn,$sql2)->fetch_assoc();
+                                $_SESSION['subscribe'] = $res2['id'];
+                                if($res2)
+                                {
+                                
+                                    $_SESSION['pendig'] = $res2['id'];
+                                            
+                                    header ('Location:users2.php');
+                        
+                                }
+                                
+                            }
+
+                            
+                           
+                        }
                     }
                 
             }else{
@@ -78,7 +77,7 @@ if (isset($_POST['package']))
                 exit;
             }
         
-        }
+        
 
     }
 
@@ -94,27 +93,27 @@ if(isset($_POST['activate2_btn2']))
 
 
 
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
-        {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
             
-            if (strpos($row['roles'], 'ACTIVATE SUBSCRIPTION') !== false) 
-            {
+        if (admin_roles_validation('ACTIVATE SUBSCRIPTION') ) 
+        {
                 $id = $_POST['activate2_id'];
 
                 $query = "UPDATE subscription SET  status='active' WHERE id='$id' ";
                 $query_run = mysqli_query($conn, $query);
                 if($query_run)
                 {
-                     $_SESSION['status'] = "Account Activated";
-                 $_SESSION['status_code'] = "Success";
-                    header('Location: users2.php'); 
+
+
+
+                    if (update_log("Activated status of subscription ID: ".$id )) 
+                    {
+                        $_SESSION['status'] = "Account Activated";
+                        $_SESSION['status_code'] = "Success";
+                           header('Location: users2.php'); 
+                    }
+
+
+                    
                 }
                 else
                 {
@@ -129,8 +128,6 @@ if(isset($_POST['activate2_btn2']))
             }
         
         }
-
-    }
 
 
     
@@ -155,27 +152,26 @@ if(isset($_POST['suspend2_btn2']))
 
 
 
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
-        {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
             
-            if (strpos($row['roles'], 'SUSPEND SUBSCRIPTION') !== false) 
-            {
+        if (admin_roles_validation('SUSPEND SUBSCRIPTION') ) 
+        {
                 $id = $_POST['suspend2_id'];
 
                 $query = "UPDATE subscription SET  status='suspended' WHERE id='$id' ";
                 $query_run = mysqli_query($conn, $query);
                 if($query_run)
                 {
-                    $_SESSION['status'] = "Account Suspended";
-                $_SESSION['status_code'] = "Success";
-                    header('Location: users2.php'); 
+
+
+
+                    if (update_log("Suspended subscription ID: ".$id )) 
+                    {
+                                $_SESSION['status'] = "Account Suspended";
+                        $_SESSION['status_code'] = "Success";
+                            header('Location: users2.php'); 
+                    }
+
+                    
                 }
                 else
                 {
@@ -191,7 +187,7 @@ if(isset($_POST['suspend2_btn2']))
         
         }
 
-    }
+    
 
 
       
@@ -207,19 +203,9 @@ if(isset($_POST['front_delete_btn2']))
         $uid =  $_SESSION['uid'];
 
 
-
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
-        {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
             
-            if (strpos($row['roles'], 'DELETE SUBSCRIPTION') !== false) 
-            {
+        if (admin_roles_validation('DELETE SUBSCRIPTION') ) 
+        {
                 $id = $_POST['delete_id'];
 
                     $query = "UPDATE subscription SET  status='deleted' WHERE id='$id' ";
@@ -227,13 +213,22 @@ if(isset($_POST['front_delete_btn2']))
 
                     if($query_run)
                     {
-                        $_SESSION['status'] = "Customer Has Been Deleted";
-                    $_SESSION['status_code'] = "success";    
-                        header('Location: users2.php'); 
+
+
+
+                        if (update_log("Deleted subscription ID: ".$id )) 
+                        {
+                                    $_SESSION['status'] = "Customer Has Been Deleted";
+                            $_SESSION['status_code'] = "success";    
+                                header('Location: users2.php'); 
+                        }
+
+
+                        
                     }
                     else
                     {
-                        $_SESSION['status'] = "Customer Has Been Deleted";
+                        $_SESSION['status'] = "Customer Has not Been Deleted";
                     $_SESSION['status_code'] = "error";        
                         header('Location: users2.php'); 
                     }     
@@ -245,14 +240,6 @@ if(isset($_POST['front_delete_btn2']))
         
         }
 
-    }
-
-
-
-
-
-
-       
 }
 if(isset($_POST['front_delete_btn3']))
 {
@@ -265,18 +252,8 @@ if(isset($_POST['front_delete_btn3']))
 
 
 
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
+        if (admin_roles_validation('DELETE SUBSCRIPTION') ) 
         {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
-            
-            if (strpos($row['roles'], 'DELETE SUBSCRIPTION') !== false) 
-            {
                 $id = $_POST['delete_id'];
 
                 $query = "UPDATE subscription SET  status='deleted' WHERE id='$id' ";
@@ -284,9 +261,14 @@ if(isset($_POST['front_delete_btn3']))
 
                 if($query_run)
                 {
-                    $_SESSION['status'] = "Subscription Has Been Deleted";
-                $_SESSION['status_code'] = "success";    
-                    header('Location: users2.php'); 
+                    if (update_log("Deleted subscription ID: ".$id )) 
+                    {
+
+                            $_SESSION['status'] = "Subscription Has Been Deleted";
+                        $_SESSION['status_code'] = "success";    
+                            header('Location: users2.php'); 
+                    }
+                    
                 }
                 else
                 {
@@ -300,20 +282,9 @@ if(isset($_POST['front_delete_btn3']))
                 exit;
             }
         
-        }
+        
 
     }
-
-
-
-
-
-
-
-
-
-
-
 
 
        

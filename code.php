@@ -1,6 +1,9 @@
 <?php
 
- include('security.php');
+ include_once('security.php');
+include ('update_log.php');
+include ('admin_roles_validation.php');
+
 
 
 if (isset($_POST['check_submit_btn'])) 
@@ -12,8 +15,6 @@ $email_query_run = mysqli_query($conn, $email_query);
 
    if (mysqli_num_rows($email_query_run) > 0)
 {
-
-
     echo"Email Exists. Please Try Another Email";
 }
 
@@ -74,25 +75,8 @@ if (isset($_POST['registerbtn2'])) {
 
 
 
-    if(isset ($_SESSION['uid']))
-    {
-        
-        
-        $uid =  $_SESSION['uid'];
-
-
-
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
-        {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
             
-            if (strpos($row['roles'], 'ADD ADMIN') !== false) 
+            if (admin_roles_validation( 'ADD ADMIN')) 
             {
 
                 
@@ -112,16 +96,33 @@ if (isset($_POST['registerbtn2'])) {
                 
                     }
                     else {
-                    
-                    $sql = "INSERT INTO `admin`( `username`, `email`, `status`, `datecreated`,`password`) VALUES ('$username','$email', 'active','$date','$password' )";
+                       
+                        
+                    $sql = "INSERT INTO `admin`( `username`, `email`,`password`,  `datecreated`,`status`,`roles`)
+                     VALUES ('$username','$email', '$password','$date','active','ADD ORGANISATION' )";
                 }
                     if (mysqli_query($conn,$sql)) {
+
+
+                       
+                    
+
+
+
+
+                      if (update_log("Added ".$email." as an organisation/ super admin")) 
+                      {
                         $sql2 = "select * from admin order by id desc";
                         $res2 = mysqli_query($conn,$sql2)->fetch_assoc();
                         $_SESSION['username'] = $res2['id'];
                         $_SESSION['status'] = "Added";
                         $_SESSION['status_code'] = "Success";
                         header("location:registration.php");
+                      }
+
+
+
+                        
                     }
                 
                                     
@@ -130,9 +131,7 @@ if (isset($_POST['registerbtn2'])) {
                 exit;
             }
         
-        }
-
-    }
+       
 
 
     
@@ -178,266 +177,101 @@ header ('Location:users2.php');
 }
 
 
-if (isset($_POST['registerbtn3'])) {
-
-
-
-
-    if(isset ($_SESSION['uid']) && isset ($_SESSION['brands']))
-    {
-        
-        
-        $uid =  $_SESSION['uid'];
-        $brand_id = $_SESSION['brands'];
-
-
-
-        $sql = "SELECT roles FROM brand_admins WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
-        {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
-            
-            if (strpos($row['roles'], 'ADD BRAND ADMIN') !== false) 
-            {
-
-                
-                
-
-                $name = mysqli_real_escape_string($conn,$_POST['username']);
-                $email = mysqli_real_escape_string($conn,$_POST['email']);
-               $password = md5(mysqli_real_escape_string($conn,$_POST['password']));
-               $datecreated = date("Y-m-d H:i:s");
-               $roles = 'add';
-           
-               $email_query = "SELECT * FROM brand_admins WHERE email = '$email'";
-               $email_query_run = mysqli_query($conn, $email_query);
-           
-               if (mysqli_num_rows($email_query_run) > 0)
-               {
-                $_SESSION['status'] = "Email Already Taken";
-                    $_SESSION['status_code'] = "error";
-                header ('Location:employee.php');
-                
-                    }
-                    else {
-                    
-                    $sql = "INSERT INTO `brand_admins` (`brand_id`,`username`, `email`, `password`,`status`, `datecreated`, `roles`)
-                     VALUES ('$brand_id','$name','$email', '$password', 'active', '$datecreated', '$roles' )";
-                }
-            if (mysqli_query($conn,$sql)) {
-                   $sql2 = "select * from brand_admins order by id desc";
-                   $res2 = mysqli_query($conn,$sql2)->fetch_assoc();
-                   $_SESSION['status'] = "Added";
-                $_SESSION['status_code'] = "Success";
-                   header("location: employee.php");
-               }                   
-            }else{
-                header("location: not_allowed_dialog.php");
-                exit;
-            }
-        
-        }
-
-    }
-
-
-}
-
-
-
-
-if (isset($_POST['registerbtn4'])) {
-
-
-    if(isset ($_SESSION['brands']) && isset ($_SESSION['email']))
-    {
-        
-        
-        $uEmail =  $_SESSION['email'];
-        $brand_id = $_SESSION['brands'];
-
-
-        
-
-        $sql = "SELECT roles FROM brand_admins WHERE email='$uEmail'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
-        {
-            
-             header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
-            
-            if (strpos($row['roles'], 'ADD EMPLOYEE') !== false || strpos($row['roles'], 'ADD REGISTER') !== false) 
-            {
-
-               
-                
-               
-                $empname = mysqli_real_escape_string($conn,$_POST['empname']);
-                $email = mysqli_real_escape_string($conn,$_POST['email']);
-                $organization = mysqli_real_escape_string($conn,$_POST['organization']);
-                $department = mysqli_real_escape_string($conn,$_POST['department']);
-                $password = md5(mysqli_real_escape_string($conn,$_POST['password']));
-                
-                $val = "1";
-                $active = settype($val, "integer");;
-                $date = date("Y-m-d");
-                $time = date("h:i:sa");
-
-
-           
-               $email_query = "SELECT * FROM register WHERE email = '$email'";
-               $email_query_run = mysqli_query($conn, $email_query);
-           
-               if (mysqli_num_rows($email_query_run) > 0)
-               {
-                $_SESSION['status'] = "Email Already Taken";
-                    $_SESSION['status_code'] = "error";
-                header ('Location:employee.php');
-                
-                    }
-                    else {
-
-
-                       // $sql = "INSERT INTO `employee` (`username`,`email`, `active`,`password`) VALUES ('$empname', '$email', '1', '$password')";
-  
-                    
-                    $sqlinsert = "INSERT INTO `register` ( `username`, `email`,`organization`, `department`, `password`,`ddd69075bc4`,`active`,`date`,`time`) 
-                    VALUES ('$empname','$email','$organization', '$department','$password','$ddd69075bc4','$active','$date','$time' )";
-                    
-                }
-
-               
-                
-                    if (mysqli_query($conn,$sqlinsert)) {
-                        $sql2 = "select * from register order by id desc";
-                        $res2 = mysqli_query($conn,$sql2)->fetch_assoc();
-                        $_SESSION['username'] = $res2['id'];
-                        $_SESSION['status'] = "Added";
-                        $_SESSION['status_code'] = "Success";
-                        header("location: employee.php");
-                    }
-                    
-                
-                                    
-            }else{
-                
-                header("location: not_allowed_dialog.php");
-                exit;
-            }
-        
-        }
-
-    }
-
-
-    
-}
-
-
-
-
-
-
 
 
 if (isset($_POST['sub_btn'])) {
 
-    
-     $email = mysqli_real_escape_string($conn,$_POST['email']);
+            $email = mysqli_real_escape_string($conn,$_POST['email']);
 
-      $email_query = "SELECT * FROM website_subscribe WHERE email = '$email'";
-    $email_query_run = mysqli_query($conn, $email_query);
+            $email_query = "SELECT * FROM website_subscribe WHERE email = '$email'";
+            $email_query_run = mysqli_query($conn, $email_query);
 
-    if (mysqli_num_rows($email_query_run) > 0)
-    {
-$_SESSION['status'] = "Email Already Taken Please Try Another One";
- $_SESSION['status_code'] = "error";
-header ('Location:websitesubscribe.php');
+            if (mysqli_num_rows($email_query_run) > 0)
+            {
+        $_SESSION['status'] = "Email Already Taken Please Try Another One";
+        $_SESSION['status_code'] = "error";
+        header ('Location:websitesubscribe.php');
 
-    }
-    else {
-     
+            }
+            else {
+            
+            $sql = "INSERT INTO `website_subscribe`(  `email`) VALUES ('$email')";
+        }
 
-    
-    $sql = "INSERT INTO `website_subscribe`(  `email`) VALUES ('$email')";
+            if (mysqli_query($conn,$sql)) {
+
+
+
+                        $dateTime = date("Y-m-d H:i:s");
+                        $email = $_SESSION['email'];
+
+                        
+                      $sql_log = "INSERT INTO `admins_log` (`adminEmail`,`activity`, `dateTime`)
+                      VALUES ('$email','ADD SUBSCRIBER','$dateTime' )";
+
+
+                      if (mysqli_query($conn,$sql_log)) 
+                      {
+                        
+                                $sql2 = "select * from website_subscribe order by id desc";
+                                $res2 = mysqli_query($conn,$sql2)->fetch_assoc();    
+                            $_SESSION['status'] = "Added";
+                            $_SESSION['status_code'] = "Success";
+                                
+                                header("location:websitesubscribe.php");
+                      }
+
+
+
+                
+            }
+  
 }
-    
 
 
-    if (mysqli_query($conn,$sql)) {
-        $sql2 = "select * from website_subscribe order by id desc";
-        $res2 = mysqli_query($conn,$sql2)->fetch_assoc();    
-    $_SESSION['status'] = "Added";
-     $_SESSION['status_code'] = "Success";
-        
-        header("location:websitesubscribe.php");
-    }
-
-    
-}
 if(isset($_POST['updatebtn']))
 {
-
-
-
 
     if(isset ($_SESSION['uid']))
     {
         
         
-        $uid =  $_SESSION['uid'];
-
-
-
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
-        {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
+        
             
-            if (strpos($row['roles'], 'EDIT ADMIN') !== false) 
+            if (admin_roles_validation('EDIT ADMIN') ) 
             {
-
-                
-                
 
                     $id = mysqli_real_escape_string($conn,$_POST['edit_id']);
                     $username = mysqli_real_escape_string($conn,$_POST['edit_username']);
                     $email = mysqli_real_escape_string($conn,$_POST['edit_email']);
                     
 
-
-
-
                     $query = "UPDATE admin SET username='$username', email='$email' WHERE id='$id' ";
                     $query_run = mysqli_query($conn, $query);
 
                     if($query_run)
                     {
-                        $_SESSION['status'] = "Updated";
-                    $_SESSION['status_code'] = "Success";
 
-                        header('Location: registration.php'); 
+
+                        if (update_log("Edited super admin: " .$email)) 
+                        {
+                        
+                                
+                            $_SESSION['status'] = "Updated";
+                            $_SESSION['status_code'] = "Success";
+        
+                                header('Location: registration.php'); 
+                        }
+
+
+
                     }
                     else
                     {
-                    $_SESSION['status'] = "Not Updated";
-                    $_SESSION['status_code'] = "error";
-                    
-                        header('Location: registration.php'); 
+                        $_SESSION['status'] = "Not Updated";
+                        $_SESSION['status_code'] = "error";
+                        
+                            header('Location: registration.php'); 
                     }
                                     
             }else{
@@ -445,48 +279,26 @@ if(isset($_POST['updatebtn']))
                 exit;
             }
         
-        }
+        
 
     }
-
-
-
-
-
-
 
 }
 
 if(isset($_POST['update_btn']))
 {
 
-
-
-
-    
     if(isset ($_SESSION['uid']))
     {
         
-        
         $uid =  $_SESSION['uid'];
 
-
-
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
-        {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
+       
             
-            if (strpos($row['roles'], 'EDIT SUBSCRIBER') !== false) 
+            
+            if (admin_roles_validation('EDIT SUBSCRIBER') ) 
             {
 
-                
-                
                 $id = mysqli_real_escape_string($conn,$_POST['edit_id']);
                 $email = mysqli_real_escape_string($conn,$_POST['edit_email']);
                
@@ -495,11 +307,20 @@ if(isset($_POST['update_btn']))
            
                if($query_run)
                {
-               $_SESSION['status'] = "Updated";
-                $_SESSION['status_code'] = "Success";
-               
-               
-                   header('Location: websitesubscribe.php'); 
+
+
+                    if (update_log("Edited website subscriber " .$email. " of organisation ID: ".$uid)) 
+                    {
+                        
+                        $_SESSION['status'] = "Updated";
+                        $_SESSION['status_code'] = "Success";
+                            
+                            
+                        header('Location: websitesubscribe.php'); 
+                    }
+
+
+
                }
                else
                {
@@ -515,20 +336,10 @@ if(isset($_POST['update_btn']))
                 exit;
             }
         
-        }
+        
 
     }
 
-
-
-
-
-
-
-
-
-
- 
 }
 
 
@@ -537,32 +348,14 @@ if(isset($_POST['update_btn']))
 if(isset($_POST['delete_btn6']))
 {
 
-
-
-
-    
     if(isset ($_SESSION['uid']))
     {
-        
-        
         $uid =  $_SESSION['uid'];
 
-
-
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
-        {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
-            
-            if (strpos($row['roles'], 'DELETE CONTACT') !== false) 
+            if (admin_roles_validation('DELETE CONTACT') ) 
             {
 
-                
+
                 
                 $id = $_POST['delete_id'];
 
@@ -571,9 +364,17 @@ if(isset($_POST['delete_btn6']))
 
                 if($query_run)
                 {
-                    $_SESSION['status'] = "Deleted";
-                $_SESSION['status_code'] = "Success";
-                    header('Location: websitecontact.php'); 
+
+
+                        if (update_log("Deleted website contact of organisation ID: " .$id)) 
+                        {
+                            
+                                    
+                            $_SESSION['status'] = "Deleted";
+                            $_SESSION['status_code'] = "Success";
+                                header('Location: websitecontact.php'); 
+                        }
+
                 }
                 else
                 {
@@ -587,44 +388,23 @@ if(isset($_POST['delete_btn6']))
                 exit;
             }
         
-        }
+        
 
     }
-
-
-
-
-
-
-
-
-       
 }
+
+
 if(isset($_POST['delete_btn7']))
 {
-
     if(isset ($_SESSION['uid']))
     {
-
         $uid =  $_SESSION['uid'];
-
 
         //get current admin's rights from db and perform DELETE operation if he/she is allowed to do so
         //otherwise show the "Not Allowed" dialog and go back to dashboard screen
 
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
-        {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
-            //verify if user has the right and perform DELETE operation
-            if (strpos($row['roles'], 'DELETE ADMIN') !== false) {
-
-
+            if (admin_roles_validation('DELETE ADMIN') ) 
+            {
 
                 //perform DELETE operation
 
@@ -635,9 +415,30 @@ if(isset($_POST['delete_btn7']))
 
                 if($query_run)
                 {
-                    $_SESSION['status'] = "Deleted";
-                $_SESSION['status_code'] = "Success";
-                    header('Location: registration.php'); 
+
+
+
+
+                    $dateTime = date("Y-m-d H:i:s");
+                            $email = $_SESSION['email'];
+
+                            
+                        $sql_log = "INSERT INTO `admins_log` (`adminEmail`,`activity`, `dateTime`)
+                        VALUES ('$email','DELETE SUPER ADMIN','$dateTime' )";
+
+
+                        if (update_log("Deleted super admin, admin ID: ".$id)) 
+                        {
+                            
+                                    
+                            
+                            $_SESSION['status'] = "Deleted";
+                            $_SESSION['status_code'] = "Success";
+                                header('Location: registration.php'); 
+                        }
+
+
+
                 }
                 else
                 {
@@ -652,7 +453,7 @@ if(isset($_POST['delete_btn7']))
                 exit;
             }
         
-        }
+        
 
     }
 
@@ -662,51 +463,69 @@ if(isset($_POST['delete_btn12']))
 {
     $id = $_POST['delete_id'];
 
-    $query = "UPDATE register  SET active='3' WHERE id='$id' ";
-    $query_run = mysqli_query($conn, $query);
 
-    if($query_run)
+
+
+    if (admin_roles_validation('DELETE REGISTER') ) 
     {
-         $_SESSION['status'] = "Deleted";
-     $_SESSION['status_code'] = "Success";
-        header('Location: violations.php'); 
+
+
+
+        
+                $query = "UPDATE register  SET active='3' WHERE id='$id' ";
+                $query_run = mysqli_query($conn, $query);
+
+                if($query_run)
+                {
+
+            
+
+
+            if (update_log("Updated status of register ID: ".$id. "to Deleted")) 
+            {
+                            
+                                $_SESSION['status'] = "Deleted";
+                                $_SESSION['status_code'] = "Success";
+                                header('Location: violations.php'); 
+            }
+
+
+                }
+                else
+                {
+                    $_SESSION['status'] = "Not Deleted";
+                $_SESSION['status_code'] = "error";       
+                    header('Location: violations.php'); 
+                } 
+
+
+
+    }else{
+        header("location: not_allowed_dialog.php");
+        exit;
     }
-    else
-    {
-        $_SESSION['status'] = "Not Deleted";
-     $_SESSION['status_code'] = "error";       
-        header('Location: violations.php'); 
-    }    
+
+
+
+
+
+
+
+
+
+
+   
 }
 if(isset($_POST['delete_btn9']))
 {
-
-
-
-
-
-    
-    
     if(isset ($_SESSION['uid']))
     {
         $uid =  $_SESSION['uid'];
 
-
-
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
-        {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
+        
             
-            if (strpos($row['roles'], 'DELETE REGISTER') !== false) 
+            if (admin_roles_validation('SUSPEND REGISTER') ) 
             {
-
-
 
                 //perform delete operation
 
@@ -717,9 +536,20 @@ if(isset($_POST['delete_btn9']))
             
                 if($query_run)
                 {
-                     $_SESSION['status'] = "Deleted";
-                 $_SESSION['status_code'] = "Success";
-                    header('Location: hack.php'); 
+
+
+                            if (update_log("Updated status of register ID: ".$id. "to Suspended")) 
+                            {
+                            
+                                    $_SESSION['status'] = "Deleted";
+                                $_SESSION['status_code'] = "Success";
+                                   header('Location: hack.php'); 
+                            }
+
+
+
+
+                     
                 }
                 else
                 {
@@ -734,44 +564,22 @@ if(isset($_POST['delete_btn9']))
                 exit;
             }
         
-        }
+        
 
     }
 
-
-
-
-   
 }
 
 if(isset($_POST['delete_btn8']))
 {
 
-
-
-
-    
     if(isset ($_SESSION['uid']))
     {
         $uid =  $_SESSION['uid'];
 
-
-
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
-        {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
-            
-            if (strpos($row['roles'], 'DELETE ORGANISATION') !== false) 
+        
+            if (admin_roles_validation('DELETE ORGANISATION') ) 
             {
-
-
-
                 //perform delete operation
 
                 $id = $_POST['delete_id'];
@@ -781,9 +589,17 @@ if(isset($_POST['delete_btn8']))
             
                 if($query_run)
                 {
-                     $_SESSION['status'] = "Deleted";
-                 $_SESSION['status_code'] = "Success";
-                    header('Location: add.php'); 
+
+                    if (update_log("Deleted organisation ID: ".$id)) 
+                    {
+                        
+                                $_SESSION['status'] = "Deleted";
+                            $_SESSION['status_code'] = "Success";
+                                header('Location: add.php'); 
+                    }
+
+
+
                 }
                 else
                 {
@@ -798,20 +614,13 @@ if(isset($_POST['delete_btn8']))
                 exit;
             }
         
-        }
+        
 
     }
 
-
-
-
-
-
-
-
-
- 
 }
+
+
  if(isset($_POST['suspend_btn']))
 {
 
@@ -821,21 +630,10 @@ if(isset($_POST['delete_btn8']))
         $uid =  $_SESSION['uid'];
 
 
-        //get current admin's rights from db and perform SUSPEND operation if allowed to do so
-        //otherwise show the "Not Allowed" dialog and go back to dashboard screen
-
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
-        {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
+        
             //verify if user has the right and perform SUSPEND operation
-            if (strpos($row['roles'], 'SUSPEND ADMIN') !== false) {
-
+            if (admin_roles_validation('SUSPEND ADMIN') ) 
+            {
                 //perform SUSPEND operation
 
                 $id = $_POST['suspend_id'];
@@ -844,9 +642,20 @@ if(isset($_POST['delete_btn8']))
                 $query_run = mysqli_query($conn, $query);
                 if($query_run)
                 {
-                    $_SESSION['status'] = "Account Suspended";
-                $_SESSION['status_code'] = "Success";
-                    header('Location: registration.php'); 
+
+
+
+                    if (update_log("Suspended super admin ID: ".$id)) 
+                    {
+                        
+                              
+                                $_SESSION['status'] = "Account Suspended";
+                            $_SESSION['status_code'] = "Success";
+                                header('Location: registration.php');
+                    }
+
+
+ 
                 }
                 else
                 {
@@ -861,7 +670,7 @@ if(isset($_POST['delete_btn8']))
                 exit;
             }
         
-        }
+        
 
     }
 
@@ -874,31 +683,13 @@ if(isset($_POST['delete_btn8']))
 
 if(isset($_POST['suspend_btn12']))
 {
-
-
-
-
-    
     if(isset ($_SESSION['uid']))
     {
         $uid =  $_SESSION['uid'];
 
-
-
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
-        {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
             
-            if (strpos($row['roles'], 'SUSPEND REGISTER') !== false) 
+            if (admin_roles_validation('SUSPEND REGISTER') ) 
             {
-
-
 
                 //perform suspend operation
 
@@ -909,9 +700,20 @@ if(isset($_POST['suspend_btn12']))
                 $query_run = mysqli_query($conn, $query);
                 if($query_run)
                 {
-                    $_SESSION['status'] = "Account Suspended";
-                $_SESSION['status_code'] = "Success";
-                    header('Location: violations.php'); 
+
+
+
+                    if (update_log("Updated status of register ID: ".$id. "to Suspended")) 
+                    {
+                        
+                            $_SESSION['status'] = "Account Suspended";
+                        $_SESSION['status_code'] = "Success";
+                            header('Location: violations.php'); 
+                    }
+
+
+
+                   
                 }
                 else
                 {
@@ -925,7 +727,7 @@ if(isset($_POST['suspend_btn12']))
                 exit;
             }
         
-        }
+        
 
     }
 
@@ -943,19 +745,9 @@ if(isset($_POST['suspend_btn12']))
 
 
 
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
-        {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
             
-            if (strpos($row['roles'], 'SUSPEND REGISTER') !== false) 
+            if (admin_roles_validation('SUSPEND REGISTER') ) 
             {
-
 
 
                 //perform suspend operation
@@ -968,9 +760,20 @@ if(isset($_POST['suspend_btn12']))
                 $query_run = mysqli_query($conn, $query);
                 if($query_run)
                 {
-                    $_SESSION['status'] = "Account Suspended";
-                $_SESSION['status_code'] = "Success";
-                    header('Location: hack.php'); 
+
+
+
+
+                    if (update_log("Updated status of register ID: ".$id. "to Suspended")) 
+                    {
+                        
+                            $_SESSION['status'] = "Account Suspended";
+                        $_SESSION['status_code'] = "Success";
+                            header('Location: hack.php'); 
+                    }
+
+
+                   
                 }
                 else
                 {
@@ -984,7 +787,7 @@ if(isset($_POST['suspend_btn12']))
                 exit;
             }
         
-        }
+        
 
     }
 
@@ -1000,19 +803,10 @@ if(isset($_POST['suspend_btn9']))
         $uid =  $_SESSION['uid'];
 
 
-
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
-        {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
             
-            if (strpos($row['roles'], 'SUSPEND ORGANISATION') !== false) 
+            if (admin_roles_validation('SUSPEND ORGANISATION') ) 
             {
+
 
 
 
@@ -1026,9 +820,19 @@ if(isset($_POST['suspend_btn9']))
                 $query_run = mysqli_query($conn, $query);
                 if($query_run)
                 {
-                    $_SESSION['status'] = "Account Suspended";
-                $_SESSION['status_code'] = "Success";
-                    header('Location: add.php'); 
+
+
+
+
+                    if (update_log("Suspended organisation ID: ".$id)) 
+                    {
+                        
+                        $_SESSION['status'] = "Account Suspended";
+                        $_SESSION['status_code'] = "Success";
+                            header('Location: add.php'); 
+                    }
+
+                   
                 }
                 else
                 {
@@ -1042,14 +846,9 @@ if(isset($_POST['suspend_btn9']))
                 exit;
             }
         
-        }
+        
 
     }
-
-
-
-
-
 
 
 }
@@ -1065,19 +864,8 @@ if(isset($_POST['activate2_btn']))
         $uid =  $_SESSION['uid'];
 
 
-
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
+        if (admin_roles_validation('ACTIVATE CUSTOMER') ) 
         {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
-            
-            if (strpos($row['roles'], 'ACTIVATE CUSTOMER') !== false) 
-            {
 
 
                 $id = $_POST['activate2_id'];
@@ -1086,9 +874,22 @@ if(isset($_POST['activate2_btn']))
                 $query_run = mysqli_query($conn, $query);
                 if($query_run)
                 {
-                    $_SESSION['status'] = "Account Activated";
-                $_SESSION['status_code'] = "Success";
-                    header('Location: users.php'); 
+
+
+
+
+                    if (update_log("Activated customer. ID: ".$id)) 
+                    {
+                        
+                                $_SESSION['status'] = "Account Activated";
+                        $_SESSION['status_code'] = "Success";
+                            header('Location: users.php'); 
+                    }
+
+
+
+
+                   
                 }
                 else
                 {
@@ -1102,7 +903,7 @@ if(isset($_POST['activate2_btn']))
                 exit;
             }
         
-        }
+        
 
     }
 
@@ -1122,18 +923,8 @@ if(isset($_POST['activate2_btn']))
 
 
 
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
+        if (admin_roles_validation('SUSPEND CUSTOMER') ) 
         {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
-            
-            if (strpos($row['roles'], 'SUSPEND CUSTOMER') !== false) 
-            {
 
 
                 $id = $_POST['suspend2_id'];
@@ -1142,9 +933,18 @@ if(isset($_POST['activate2_btn']))
                 $query_run = mysqli_query($conn, $query);
                 if($query_run)
                 {
-                    $_SESSION['status'] = "Account Suspended";
-                $_SESSION['status_code'] = "Success";
-                    header('Location: users.php'); 
+
+
+
+                    if (update_log("Suspend customer. ID: ".$id)) 
+                    {
+                        
+                            $_SESSION['status'] = "Account Suspended";
+                        $_SESSION['status_code'] = "Success";
+                            header('Location: users.php'); 
+                    }
+
+                    
                 }
                 else
                 {
@@ -1158,7 +958,7 @@ if(isset($_POST['activate2_btn']))
                 exit;
             }
         
-        }
+        
 
     }
 
@@ -1178,20 +978,8 @@ if(isset($_POST['suspend2_btn2']))
         $uid =  $_SESSION['uid'];
 
 
-
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
+        if (admin_roles_validation('SUSPEND REGISTER') ) 
         {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
-            
-            if (strpos($row['roles'], 'SUSPEND REGISTER') !== false) 
-            {
-
 
                 $id = $_POST['suspend2_id'];
 
@@ -1199,9 +987,18 @@ if(isset($_POST['suspend2_btn2']))
                 $query_run = mysqli_query($conn, $query);
                 if($query_run)
                 {
-                     $_SESSION['status'] = "Account Suspended";
-                 $_SESSION['status_code'] = "Success";
-                    header('Location: users2.php'); 
+
+                    if (update_log("Updated status of register ID: ".$id. "to Suspended")) 
+                    {
+                        
+                            $_SESSION['status'] = "Account Suspended";
+                        $_SESSION['status_code'] = "Success";
+                           header('Location: users2.php');  
+                    }
+
+
+
+                    
                 }
                 else
                 {
@@ -1215,7 +1012,7 @@ if(isset($_POST['suspend2_btn2']))
                 exit;
             }
         
-        }
+        
 
     }
 
@@ -1232,21 +1029,9 @@ if(isset($_POST['activate_btn']))
         $uid =  $_SESSION['uid'];
 
 
-        //get current admin's rights from db and perform ACTIVATE operation if allowed to do so
-        //otherwise show the "Not Allowed" dialog and go back to dashboard screen
-
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
+       //verify if user has the right and perform ACTIVATE operation
+        if (admin_roles_validation('ACTIVATE ADMIN') ) 
         {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
-            //verify if user has the right and perform ACTIVATE operation
-            if (strpos($row['roles'], 'ACTIVATE ADMIN') !== false) 
-            {
 
 
 
@@ -1257,9 +1042,15 @@ if(isset($_POST['activate_btn']))
                 $query_run = mysqli_query($conn, $query);
                 if($query_run)
                 {
-                     $_SESSION['status'] = "Account Activated";
-                 $_SESSION['status_code'] = "Success";
-                    header('Location: registration.php'); 
+
+                    if (update_log("Activated super admin. ID: ".$id)) 
+                    {
+                            
+                                $_SESSION['status'] = "Account Activated";
+                            $_SESSION['status_code'] = "Success";
+                           header('Location: registration.php');   
+                    }
+                     
                 }
                 else
                 {
@@ -1279,9 +1070,6 @@ if(isset($_POST['activate_btn']))
     }
 
 
-
-      
-}
 if(isset($_POST['activate_btn10']))
 {
 
@@ -1302,9 +1090,8 @@ if(isset($_POST['activate_btn10']))
         }
         while($row = mysqli_fetch_array($result)){
             
-            if (strpos($row['roles'], 'ACTIVATE REGISTER') !== false) 
+            if (admin_roles_validation('ACTIVATE REGISTER') ) 
             {
-
 
                 $id = $_POST['activate_id'];
 
@@ -1312,9 +1099,20 @@ if(isset($_POST['activate_btn10']))
                 $query_run = mysqli_query($conn, $query);
                 if($query_run)
                 {
-                    $_SESSION['status'] = "Account Activated";
-                $_SESSION['status_code'] = "Success";
-                    header('Location: hack.php'); 
+
+
+
+                    if (update_log("Updated status of register ID: ".$id. "to Active")) 
+                    {
+                        
+                            $_SESSION['status'] = "Account Activated";
+                        $_SESSION['status_code'] = "Success";
+                            header('Location: hack.php');   
+                    }
+
+
+
+                    
                 }
                 else
                 {
@@ -1338,14 +1136,11 @@ if(isset($_POST['activate_btn10']))
 
     
 }
+
+
  if(isset($_POST['activate_btn9']))
 {
 
-
-
-
-
-    
     if(isset ($_SESSION['uid']))
     {
         $uid =  $_SESSION['uid'];
@@ -1362,7 +1157,7 @@ if(isset($_POST['activate_btn10']))
         }
         while($row = mysqli_fetch_array($result)){
             
-            if (strpos($row['roles'], 'ACTIVATE ORGANISATION') !== false) 
+            if (admin_roles_validation('ACTIVATE ORGANISATION') ) 
             {
 
                 $id = $_POST['activate_id'];
@@ -1371,9 +1166,21 @@ if(isset($_POST['activate_btn10']))
                 $query_run = mysqli_query($conn, $query);
                 if($query_run)
                 {
-                     $_SESSION['status'] = "Account Activated";
-                 $_SESSION['status_code'] = "Success";
-                    header('Location: add.php'); 
+
+
+
+
+                    if (update_log("Activated organisation ID: ".$id)) 
+                    {
+                        
+                            $_SESSION['status'] = "Account Activated";
+                        $_SESSION['status_code'] = "Success";
+                           header('Location: add.php');  
+                    }
+
+
+
+                     
                 }
                 else
                 {
@@ -1408,17 +1215,8 @@ if(isset($_POST['activate_btn10']))
 
 
 
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
-        {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
             
-            if (strpos($row['roles'], 'DELETE CONTACT') !== false) 
+            if (admin_roles_validation('DELETE CONTACT') ) 
             {
 
                 $id = $_POST['deleteid'];
@@ -1428,9 +1226,21 @@ if(isset($_POST['activate_btn10']))
 
                 if($query_run)
                 {
-                    $_SESSION['status'] = "Message Deleted";
-                $_SESSION['status_code'] = "Success";
-                    header('Location: messages.php'); 
+
+
+
+                    if (update_log("Deleted website contacts of organisation ID: ".$uid)) 
+                    {
+                        
+                            $_SESSION['status'] = "Message Deleted";
+                        $_SESSION['status_code'] = "Success";
+                            header('Location: messages.php');  
+                    }
+
+
+
+
+                    
                 }
                 else
                 { 
@@ -1444,7 +1254,7 @@ if(isset($_POST['activate_btn10']))
                 exit;
             }
         
-        }
+        
 
     }
 
@@ -1462,20 +1272,9 @@ if(isset($_POST['eventbtn']))
         $uid =  $_SESSION['uid'];
 
 
-
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
-        {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
             
-            if (strpos($row['roles'], 'DELETE EVENT') !== false) 
+            if (admin_roles_validation('DELETE EVENT') ) 
             {
-
                 
                 $id = $_POST['eventid'];
 
@@ -1484,9 +1283,18 @@ if(isset($_POST['eventbtn']))
 
                 if($query_run)
                 {
-                    $_SESSION['status'] = "Message Deleted";
-                $_SESSION['status_code'] = "Success";
-                    header('Location: eventdata.php'); 
+
+
+                    if (update_log("Deleted event ID: ".$id." of organisation ID: ".$uid)) 
+                    {
+                        
+                            $_SESSION['status'] = "Message Deleted";
+                        $_SESSION['status_code'] = "Success";
+                            header('Location: eventdata.php'); 
+                    }
+
+
+                     
                 }
                 else
                 { 
@@ -1500,7 +1308,7 @@ if(isset($_POST['eventbtn']))
                 exit;
             }
         
-        }
+        
 
     }
 
@@ -1521,19 +1329,8 @@ if(isset($_POST['delete_btn']))
         $uid =  $_SESSION['uid'];
 
 
-
-        $sql = "SELECT roles FROM admin WHERE id='$uid'";
-        $result = mysqli_query($conn,$sql);
-
-        if (mysqli_num_rows($result)==0)
+        if (admin_roles_validation('DELETE SUBSCRIBER') ) 
         {
-            header("location: not_allowed_dialog.php");
-            exit;
-        }
-        while($row = mysqli_fetch_array($result)){
-            
-            if (strpos($row['roles'], 'DELETE SUBSCRIBER') !== false) 
-            {
 
                 
                 $id= $_POST['delete_id'];
@@ -1543,9 +1340,23 @@ if(isset($_POST['delete_btn']))
 
                 if($query_run)
                 {
-                    $_SESSION['status'] = "Email Deleted";
-                $_SESSION['status_code'] = "Success";
-                    header('Location: websitesubscribe.php'); 
+
+
+
+
+
+                    if (update_log("Deleted website subscriber ID: ".$id." of organisation ID: ".$uid)) 
+                    {
+                        
+                            $_SESSION['status'] = "Email Deleted";
+                        $_SESSION['status_code'] = "Success";
+                            header('Location: websitesubscribe.php'); 
+                    }
+
+
+
+
+                     
                 }
                 else
                 {
@@ -1559,14 +1370,9 @@ if(isset($_POST['delete_btn']))
                 exit;
             }
         
-        }
+        
 
     }
-
-
-
-
-
 
     
 }
@@ -1605,16 +1411,26 @@ header ('Location:users.php');
     
 
     
-    $sql = "INSERT INTO `customers` ( `name`, `email`, `status`, `datecreated`, `department`,`password`) VALUES ('$name','$email', 'active', '$date','$department','$password' )";
+    $sql = "INSERT INTO `customers` ( `name`, `email`, `status`, `datecreated`, `department`,`password`)
+            VALUES ('$name','$email', 'active', '$date','$department','$password' )";
 }
     
 
 
     if (mysqli_query($conn,$sql)) {
+
+
+
         $sql2 = "select * from customers order by id desc";
         $res2 = mysqli_query($conn,$sql2)->fetch_assoc();
         $_SESSION['username'] = $res2['id'];
-        header("location:users.php");
+        header("location:users.php"); 
+
+
+
+
+
+        
     }
 
     
@@ -1649,9 +1465,29 @@ header ('Location:clients.php');
 
 
     if (mysqli_query($conn,$sql)) {
-        $sql2 = "select * from clients order by id desc";
-        $res2 = mysqli_query($conn,$sql2)->fetch_assoc();
-        header("location:clients.php");
+
+
+
+                    $dateTime = date("Y-m-d H:i:s");
+                    $email = $_SESSION['email'];
+
+                                    
+                    $sql_log = "INSERT INTO `admins_log` (`adminEmail`,`activity`, `dateTime`)
+                    VALUES ('$email','ADD CLIENT','$dateTime' )";
+
+
+                    if (mysqli_query($conn,$sql_log)) 
+                    {
+                        
+                        $sql2 = "select * from clients order by id desc";
+                        $res2 = mysqli_query($conn,$sql2)->fetch_assoc();
+                        header("location:clients.php"); 
+                    }
+
+
+
+
+        
     }
 
     
@@ -1667,9 +1503,13 @@ if(isset($_POST['front_delete_btn']))
 
     if($query_run)
     {
+
+
+                 
         $_SESSION['status'] = "Customer Has Been Deleted";
-     $_SESSION['status_code'] = "success";    
-        header('Location: users.php'); 
+        $_SESSION['status_code'] = "success";    
+            header('Location: users.php'); 
+        
     }
     else
     {
@@ -1689,9 +1529,17 @@ if(isset($_POST['deleteclient_btn']))
 
     if($query_run)
     {
+
+
+
+                 
         $_SESSION['status'] = "Client Data Has Been Deleted";
-     $_SESSION['status_code'] = "success";    
-        header('Location: clients.php'); 
+        $_SESSION['status_code'] = "success";    
+           header('Location: clients.php');  
+
+
+
+        
     }
     else
     {
@@ -1830,9 +1678,14 @@ $query_run = mysqli_query($conn, $query);
 
     if($query_run)
     {
-         $_SESSION['status'] = "Data  Has Been Deleted";
-     $_SESSION['status_code'] = "success";  
-        header('Location: brand.php'); 
+
+
+        $_SESSION['status'] = "Data  Has Been Deleted";
+        $_SESSION['status_code'] = "success";  
+           header('Location: brand.php'); 
+
+
+         
     }
     else
     {
@@ -1900,15 +1753,6 @@ if(isset($_POST['delete_multiple_data']))
     }   
 
     } 
-
-
-
-
-
-
-
- 
-
 
 
 
